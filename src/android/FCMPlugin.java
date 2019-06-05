@@ -4,6 +4,8 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaInterface;
+
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -12,23 +14,25 @@ import org.json.JSONObject;
 
 import android.os.Bundle;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.Map;
 
 public class FCMPlugin extends CordovaPlugin {
- 
+
 	private static final String TAG = "FCMPlugin";
-	
+
 	public static CordovaWebView gWebView;
 	public static String notificationCallBack = "FCMPlugin.onNotificationReceived";
 	public static String tokenRefreshCallBack = "FCMPlugin.onTokenRefreshReceived";
 	public static Boolean notificationCallBackReady = false;
 	public static Map<String, Object> lastPush = null;
-	 
+
 	public FCMPlugin() {}
-	
+
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
 		gWebView = webView;
@@ -36,11 +40,11 @@ public class FCMPlugin extends CordovaPlugin {
 		FirebaseMessaging.getInstance().subscribeToTopic("android");
 		FirebaseMessaging.getInstance().subscribeToTopic("all");
 	}
-	 
+
 	public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
 
 		Log.d(TAG,"==> FCMPlugin execute: "+ action);
-		
+
 		try{
 			// READY //
 			if (action.equals("ready")) {
@@ -49,14 +53,39 @@ public class FCMPlugin extends CordovaPlugin {
 			}
 			// GET TOKEN //
 			else if (action.equals("getToken")) {
-				cordova.getActivity().runOnUiThread(new Runnable() {
+				cordova.getThreadPool().execute(new Runnable() {
 					public void run() {
 						try{
+
+							String androidProjectId = args.getString(0);
+							String secondProjectId = args.getString(1);
+
+							Log.d(TAG, "AndroidID: "+androidProjectId);
+							Log.d(TAG, "secondProjectId: "+secondProjectId);
+
+							FirebaseOptions options = new FirebaseOptions.Builder()
+									.setApplicationId("1:1086238523525:android:c3e1c6b017e2b76f")
+									.build();
+
+							FirebaseApp banxicoApp = FirebaseApp.initializeApp(cordova.getContext(),options,"banxicoApp");
+							//getTokenWithSender();
+
+							String tokenBanxico = FirebaseInstanceId.getInstance(banxicoApp).getToken("1086238523525","FCM");
+							Log.d(TAG, "TokenBanxico:"+tokenBanxico);
 							String token = FirebaseInstanceId.getInstance().getToken();
-							callbackContext.success( FirebaseInstanceId.getInstance().getToken() );
+							Log.d(TAG, "InstanceId: "+FirebaseInstanceId.getInstance().getId());
+							//callbackContext.success( FirebaseInstanceId.getInstance().getToken() );
 							Log.d(TAG,"\tToken: "+ token);
+
+							JSONObject result = new JSONObject();
+							result.put("TokenBanxico", tokenBanxico);
+							result.put("tokenPrivado", token);
+
+							callbackContext.success(result);
 						}catch(Exception e){
 							Log.d(TAG,"\tError retrieving token");
+							Log.d(TAG, e.toString());
+							Log.d(TAG, e.getMessage());
 						}
 					}
 				});
@@ -106,13 +135,13 @@ public class FCMPlugin extends CordovaPlugin {
 			callbackContext.error(e.getMessage());
 			return false;
 		}
-		
+
 		//cordova.getThreadPool().execute(new Runnable() {
 		//	public void run() {
 		//	  //
 		//	}
 		//});
-		
+
 		//cordova.getActivity().runOnUiThread(new Runnable() {
         //    public void run() {
         //      //
@@ -120,7 +149,7 @@ public class FCMPlugin extends CordovaPlugin {
         //});
 		return true;
 	}
-	
+
 	public static void sendPushPayload(Map<String, Object> payload) {
 		Log.d(TAG, "==> FCMPlugin sendPushPayload");
 		Log.d(TAG, "\tnotificationCallBackReady: " + notificationCallBackReady);
@@ -154,7 +183,28 @@ public class FCMPlugin extends CordovaPlugin {
 			Log.d(TAG, "\tERROR sendRefreshToken: " + e.getMessage());
 		}
 	}
-  
+
+	/*
+	private void getTokenWithSender(){
+		cordova.getThreadPool().execute(new Runnable() {
+			public void run() {
+				FirebaseOptions options = new FirebaseOptions.Builder()
+						.setApplicationId("1:201247069219:android:c3e1c6b017e2b76f")
+						.build();
+
+				FirebaseApp banxicoApp = FirebaseApp.initializeApp(cordova.getContext(),options,"banxicoApp");
+
+				try{
+					String tokenBanxico = FirebaseInstanceId.getInstance(banxicoApp).getToken("201247069219","FCM");
+					Log.d(TAG, "TokenBanxico:"+tokenBanxico);
+				} catch(Exception e) {
+					Log.e(TAG, "Error: "+e.toString());
+				}
+
+			}
+		});
+	}
+  */
   @Override
 	public void onDestroy() {
 		gWebView = null;

@@ -22,8 +22,8 @@ FCMPlugin.prototype.onTokenRefresh = function( callback ){
 	FCMPlugin.prototype.onTokenRefreshReceived = callback;
 }
 // GET TOKEN //
-FCMPlugin.prototype.getToken = function( success, error ){
-	exec(success, error, "FCMPlugin", 'getToken', []);
+FCMPlugin.prototype.getToken = function( androidId, secondProjectId, success, error ){
+	exec(success, error, "FCMPlugin", 'getToken', [androidId, secondProjectId]);
 }
 
 // DEFAULT NOTIFICATION CALLBACK //

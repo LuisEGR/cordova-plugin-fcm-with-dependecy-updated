@@ -63,22 +63,24 @@ public class FCMPlugin extends CordovaPlugin {
 							Log.d(TAG, "AndroidID: "+androidProjectId);
 							Log.d(TAG, "secondProjectId: "+secondProjectId);
 
+							String secondAppId = "1"+secondProjectId+":android:"+androidProjectId;
+
 							FirebaseOptions options = new FirebaseOptions.Builder()
-									.setApplicationId("1:1086238523525:android:c3e1c6b017e2b76f")
+									.setApplicationId(secondAppId)
 									.build();
 
-							FirebaseApp banxicoApp = FirebaseApp.initializeApp(cordova.getContext(),options,"banxicoApp");
+							FirebaseApp secondApp = FirebaseApp.initializeApp(cordova.getContext(),options,"secondApp");
 							//getTokenWithSender();
 
-							String tokenBanxico = FirebaseInstanceId.getInstance(banxicoApp).getToken("1086238523525","FCM");
-							Log.d(TAG, "TokenBanxico:"+tokenBanxico);
+							String tokenSecondApp = FirebaseInstanceId.getInstance(secondApp).getToken(secondProjectId,"FCM");
+							Log.d(TAG, "tokenSecondApp:"+tokenSecondApp);
 							String token = FirebaseInstanceId.getInstance().getToken();
 							Log.d(TAG, "InstanceId: "+FirebaseInstanceId.getInstance().getId());
 							//callbackContext.success( FirebaseInstanceId.getInstance().getToken() );
 							Log.d(TAG,"\tToken: "+ token);
 
 							JSONObject result = new JSONObject();
-							result.put("TokenBanxico", tokenBanxico);
+							result.put("tokenSecondApp", tokenSecondApp);
 							result.put("tokenPrivado", token);
 
 							callbackContext.success(result);
@@ -136,17 +138,6 @@ public class FCMPlugin extends CordovaPlugin {
 			return false;
 		}
 
-		//cordova.getThreadPool().execute(new Runnable() {
-		//	public void run() {
-		//	  //
-		//	}
-		//});
-
-		//cordova.getActivity().runOnUiThread(new Runnable() {
-        //    public void run() {
-        //      //
-        //    }
-        //});
 		return true;
 	}
 
@@ -184,27 +175,6 @@ public class FCMPlugin extends CordovaPlugin {
 		}
 	}
 
-	/*
-	private void getTokenWithSender(){
-		cordova.getThreadPool().execute(new Runnable() {
-			public void run() {
-				FirebaseOptions options = new FirebaseOptions.Builder()
-						.setApplicationId("1:201247069219:android:c3e1c6b017e2b76f")
-						.build();
-
-				FirebaseApp banxicoApp = FirebaseApp.initializeApp(cordova.getContext(),options,"banxicoApp");
-
-				try{
-					String tokenBanxico = FirebaseInstanceId.getInstance(banxicoApp).getToken("201247069219","FCM");
-					Log.d(TAG, "TokenBanxico:"+tokenBanxico);
-				} catch(Exception e) {
-					Log.e(TAG, "Error: "+e.toString());
-				}
-
-			}
-		});
-	}
-  */
   @Override
 	public void onDestroy() {
 		gWebView = null;

@@ -6,14 +6,24 @@
 #import <Cordova/CDV.h>
 #import "FCMPlugin.h"
 #import "Firebase.h"
+#import "FIROptions.h"
+#import "FIRApp.h"
+#import "FirebaseInstanceID.h"
 
 @interface FCMPlugin () {}
+
 @end
 
 @implementation FCMPlugin
 
 static BOOL notificatorReceptorReady = NO;
 static BOOL appInForeground = YES;
+
+// @property (readwrite, copy, nonatomic, nullable) NSString *APIKey;
+// @property (readwrite, copy, nonatomic) NSString *_Nonnull bundleID;
+// @property (readwrite, copy, nonatomic, nullable) NSString *projectID;
+// @property (readwrite, copy, nonatomic) NSString *_Nonnull googleAppID;
+// @property (readwrite, copy, nonatomic) NSString *_Nonnull GCMSenderID;
 
 static NSString *notificationCallback = @"FCMPlugin.onNotificationReceived";
 static NSString *tokenRefreshCallback = @"FCMPlugin.onTokenRefreshReceived";
@@ -37,12 +47,61 @@ static FCMPlugin *fcmPluginInstance;
     
 }
 
+
+
 // GET TOKEN //
-- (void) getToken:(CDVInvokedUrlCommand *)command 
+- (void) getToken:(CDVInvokedUrlCommand *)command
 {
     NSLog(@"get Token");
+    NSString* iosProjectId = [command.arguments objectAtIndex:0];
+    NSString* secondProjectId = [command.arguments objectAtIndex:1];
+    
+    NSString* secondAppId = "1"+secondProjectId+":ios:"+iosProjectId;
+    NSLog(@"iosProjectId: " + iosProjectId);
+    NSLog(@"secondProjectId: " + secondProjectId);
+    NSLog(@"secondAppId: " + secondAppId);
+    
+    
+    // FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:secondAppId];
+    //     if (options == nil) {
+    //        return;
+    //     }
+    
+    //    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
+    //                                             NSError * _Nullable error) {
+    //     if (error != nil) {
+    //          NSLog(@"Error fetching remote instance ID: %@", error);
+    //     } else {
+    //          NSLog(@"Remote instance ID token: %@", result.token);
+    //          self.token = result.token
+    //     }
+    //     }];
+    
+    NSLog(@"First App count: " + [FIRApp allAps].count);
+    
+    //FIRApp configureWithName: "secoundApp" configureWithOptions:options];
+    //FIRApp *app2 = [FIRApp appNamed:  "secoundApp"];
+    
+    
+    // NSString* token = ""
+    // NSString* tokenSecondApp = ""
+    
+    
+    
+    // [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result,
+    //                                             NSError * _Nullable error) {
+    //     if (error != nil) {
+    //          NSLog(@"Error fetching remote instance ID: %@", error);
+    //     } else {
+    //          NSLog(@"Remote instance ID token: %@", result.token);
+    //          self.tokenSecondApp = result.token
+    //     }
+    //     }];
+    
+    
     [self.commandDelegate runInBackground:^{
         NSString* token = [[FIRInstanceID instanceID] token];
+        NSLog(@"Token: " + token);
         CDVPluginResult* pluginResult = nil;
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:token];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -50,7 +109,7 @@ static FCMPlugin *fcmPluginInstance;
 }
 
 // UN/SUBSCRIBE TOPIC //
-- (void) subscribeToTopic:(CDVInvokedUrlCommand *)command 
+- (void) subscribeToTopic:(CDVInvokedUrlCommand *)command
 {
     NSString* topic = [command.arguments objectAtIndex:0];
     NSLog(@"subscribe To Topic %@", topic);
@@ -62,7 +121,7 @@ static FCMPlugin *fcmPluginInstance;
     }];
 }
 
-- (void) unsubscribeFromTopic:(CDVInvokedUrlCommand *)command 
+- (void) unsubscribeFromTopic:(CDVInvokedUrlCommand *)command
 {
     NSString* topic = [command.arguments objectAtIndex:0];
     NSLog(@"unsubscribe From Topic %@", topic);
@@ -131,3 +190,4 @@ static FCMPlugin *fcmPluginInstance;
 }
 
 @end
+

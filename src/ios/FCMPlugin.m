@@ -57,10 +57,9 @@ static FCMPlugin *fcmPluginInstance;
     NSString* secondProjectId = [command.arguments objectAtIndex:1];
     
     NSString* secondAppId = "1"+secondProjectId+":ios:"+iosProjectId;
-    NSLog(@"iosProjectId: " + iosProjectId);
-    NSLog(@"secondProjectId: " + secondProjectId);
-    NSLog(@"secondAppId: " + secondAppId);
-    
+    NSLog(@"iosProjectId: %@ \n", iosProjectId);
+    NSLog(@"secondProjectId: %@ \n", secondProjectId);
+    NSLog(@"secondAppId: %@ \n", secondAppId);
     
     // FIROptions *options = [[FIROptions alloc] initWithGoogleAppID:secondAppId];
     //     if (options == nil) {
@@ -77,7 +76,7 @@ static FCMPlugin *fcmPluginInstance;
     //     }
     //     }];
     
-    NSLog(@"First App count: " + [FIRApp allAps].count);
+  NSLog(@"First App count: %d \n", [FIRApp allAps].count);
     
     //FIRApp configureWithName: "secoundApp" configureWithOptions:options];
     //FIRApp *app2 = [FIRApp appNamed:  "secoundApp"];
